@@ -175,7 +175,7 @@ fn main() -> Result<()> {
                 let folder_name = cli.destination.clone().unwrap_or(repo_name);
                 let new_path = tries_dir.join(&folder_name);
 
-                eprintln!("Cloning {} into {}...", selection, folder_name);
+                eprintln!("{}", t!("cloning-repository", { "selection" => selection, "folder_name" => folder_name }));
 
                 let mut cmd = std::process::Command::new("git");
                 cmd.arg("clone");
@@ -202,7 +202,7 @@ fn main() -> Result<()> {
                         }
                     }
                     _ => {
-                        eprintln!("Error: Failed to clone the repository.");
+                        eprintln!("{}", t!("failure-to-clone"));
                     }
                 }
             } else {

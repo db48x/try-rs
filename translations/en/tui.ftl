@@ -1,0 +1,9 @@
+removed-dir = Deleted: “{ $path_to_remove }”
+remove-dir-error = Error deleting: { $error }
+theme-selection-title = {" "}Select Theme{" "}
+config-selection-title = {" "}Select Config Location{" "}
+config-selection-system = System Config (~/.config/try-rs/{ $config_name })
+config-selection-home = Home Directory (~/{ $config_name })
+about-popup-title = {" "}About{" "}
+about-license-prefix = 📜 License:{" "}
+about-close-hint = Press Esc to close

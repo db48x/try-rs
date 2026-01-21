@@ -1,6 +1,7 @@
 use anyhow::Result;
 use chrono::Local;
 use crossterm::event::{self, Event, KeyCode};
+use fluent_i18n::t;
 use fuzzy_matcher::FuzzyMatcher;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use ratatui::{prelude::*, widgets::*};
@@ -165,10 +166,10 @@ impl App {
                 Ok(_) => {
                     self.all_entries.retain(|e| e.name != entry_name);
                     self.update_search();
-                    self.status_message = Some(format!("Deleted: {}", path_to_remove.display()));
+                    self.status_message = Some(t!("removed-dir", { "path_to_remove" => path_to_remove }));
                 }
                 Err(e) => {
-                    self.status_message = Some(format!("Error deleting: {}", e));
+                    self.status_message = Some(t!("remove-dir-error", { "error" => e.to_string() }));
                 }
             }
         }
@@ -239,7 +240,7 @@ fn draw_theme_select(f: &mut Frame, app: &mut App) {
     f.render_widget(Clear, popup_area);
 
     let block = Block::default()
-        .title(" Select Theme ")
+        .title(t!("theme-selection-title"))
         .borders(Borders::ALL)
         .style(Style::default().bg(app.theme.popup_bg));
 
@@ -287,15 +288,15 @@ fn draw_config_location_select(f: &mut Frame, app: &mut App) {
     f.render_widget(Clear, popup_area);
 
     let block = Block::default()
-        .title(" Select Config Location ")
+        .title(t!("config-selection-title"))
         .borders(Borders::ALL)
         .style(Style::default().bg(app.theme.popup_bg));
 
     let config_name = get_file_config_toml_name();
     let items = vec![
-        ListItem::new(format!("System Config (~/.config/try-rs/{})", config_name))
+        ListItem::new(t!("config-selection-system", { "config_name" => config_name }))
             .style(Style::default().fg(app.theme.list_highlight_fg)),
-        ListItem::new(format!("Home Directory (~/{})", config_name))
+        ListItem::new(t!("config-selection-home", { "config_name" => config_name }))
             .style(Style::default().fg(app.theme.list_highlight_fg)),
     ];
 
@@ -335,7 +336,7 @@ fn draw_about_popup(f: &mut Frame, theme: &Theme) {
     f.render_widget(Clear, popup_area);
 
     let block = Block::default()
-        .title(" About ")
+        .title(t!("about-popup-title"))
         .borders(Borders::ALL)
         .style(Style::default().bg(theme.popup_bg));
 
@@ -371,7 +372,7 @@ fn draw_about_popup(f: &mut Frame, theme: &Theme) {
         )),
         Line::from(""),
         Line::from(vec![
-            Span::styled("📜 License: ", Style::default().fg(theme.help_text)),
+            Span::styled(t!("about-license-prefix"), Style::default().fg(theme.help_text)),
             Span::styled(
                 "MIT",
                 Style::default()
@@ -381,7 +382,7 @@ fn draw_about_popup(f: &mut Frame, theme: &Theme) {
         ]),
         Line::from(""),
         Line::from(Span::styled(
-            "Press Esc to close",
+            t!("about-close-hint"),
             Style::default().fg(theme.help_text),
         )),
     ];
