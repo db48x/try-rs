@@ -5,6 +5,7 @@ use crossterm::{
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
+use fluent_i18n::{i18n, t};
 use ratatui::prelude::*;
 use std::process::Stdio;
 use std::{
@@ -25,7 +26,12 @@ use shell::{setup_bash, setup_fish, setup_nushell, setup_powershell, setup_zsh};
 use tui::{App, run_app};
 use utils::{extract_repo_name, is_git_url, is_inside_git_repo};
 
+i18n!("translations", fallback = "en");
+
 fn main() -> Result<()> {
+    // detect system locale
+    fluent_i18n::set_locale(None)?;
+
     let cli = match Cli::try_parse() {
         Ok(cli) => cli,
         Err(err) => {
@@ -53,24 +59,19 @@ fn main() -> Result<()> {
 
     if let Some(worktree_name) = cli.worktree {
         if !is_inside_git_repo() {
-            eprintln!("Erro: Não está em um repositório git.");
-            eprintln!("O comando -w/--worktree só funciona dentro de um repositório git.");
+            eprintln!("{}", t!("not-in-git-repository"));
             std::process::exit(1);
         }
 
         let new_path = tries_dir.join(&worktree_name);
 
         if new_path.exists() {
-            eprintln!("Worktree '{}' já existe.", worktree_name);
+            eprintln!("{}", t!("worktree-already-exists", { "worktree_name" => &worktree_name }));
             println!("cd '{}'", new_path.to_string_lossy());
             return Ok(());
         }
 
-        eprintln!(
-            "Criando worktree '{}' em {}...",
-            worktree_name,
-            new_path.display()
-        );
+        eprintln!("{}", t!("creating-worktree", { "worktree_name" => &worktree_name, "new_path" => new_path }));
 
         let status = std::process::Command::new("git")
             .args(["worktree", "add", new_path.to_str().unwrap()])
@@ -83,7 +84,7 @@ fn main() -> Result<()> {
                 println!("cd '{}'", new_path.to_string_lossy());
             }
             _ => {
-                eprintln!("Erro: Falha ao criar worktree.");
+                eprintln!("{}", t!("failure-creating-worktree", { "new_path" => new_path }));
                 std::process::exit(1);
             }
         }
